@@ -144,6 +144,7 @@ The `--logbase` flag points the [experiment loaders](scripts/plan_guided.py#L22-
 You can override planning hyperparameters with flags, such as `--batch_size 8`, but the default
 hyperparameters are a good starting point.
 
+
 ## Training from scratch
 
 1. Train a diffusion model with:
