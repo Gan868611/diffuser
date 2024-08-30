@@ -2,9 +2,10 @@ FROM nvidia/cuda:11.1.1-cudnn8-runtime-ubuntu20.04
 
 SHELL ["/bin/bash", "-c"]
 
-##########################################################
-### System dependencies
-##########################################################
+
+#########################################################
+## System dependencies
+#########################################################
 
 RUN apt-get update -q \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -52,13 +53,13 @@ ENV PATH $PATH:/root/google-cloud-sdk/bin
 ##########################################################
 # Note: ~ is an alias for /root
 RUN mkdir -p /root/.mujoco \
-    && wget https://www.roboti.us/download/mujoco200_linux.zip -O mujoco.zip \
+    && wget https://www.roboti.us/download/mujoco200_linux.zip -O mujoco.zip --no-check-certificate \
     && unzip mujoco.zip -d /root/.mujoco \
     && rm mujoco.zip
-RUN mkdir -p /root/.mujoco \
-    && wget https://www.roboti.us/download/mjpro150_linux.zip -O mujoco.zip \
-    && unzip mujoco.zip -d /root/.mujoco \
-    && rm mujoco.zip
+# RUN mkdir -p /root/.mujoco \
+#     && wget https://www.roboti.us/download/mjpro150_linux.zip -O mujoco.zip --no-check-certificate \
+#     && unzip mujoco.zip -d /root/.mujoco \
+#     && rm mujoco.zip
 RUN ln -s /root/.mujoco/mujoco200_linux /root/.mujoco/mujoco200
 ENV LD_LIBRARY_PATH /root/.mujoco/mjpro150/bin:${LD_LIBRARY_PATH}
 ENV LD_LIBRARY_PATH /root/.mujoco/mujoco200/bin:${LD_LIBRARY_PATH}
