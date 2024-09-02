@@ -1,0 +1,43 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Train diffuser halfcheetah",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/code/scripts/train.py",
+            "args": [
+                "--dataset","halfcheetah-medium-expert-v2"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Train value halfcheetah",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/code/scripts/train_values.py",
+            "args": [
+                "--dataset","halfcheetah-medium-expert-v2"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Plan guided halfcheetah",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/code/scripts/plan_guided.py",
+            "args": [
+                "--dataset","halfcheetah-medium-expert-v2",
+                "--logbase",  "logs",
+                "--horizon", "4",
+                "--n_diffusion_steps",  "20",
+                "--discount", "0.99",
+                "--value_loadpath", "f:values/defaults_H4_T20_d0.99"
+            ],
+            "console": "integratedTerminal",
+        }
+    ]
+}

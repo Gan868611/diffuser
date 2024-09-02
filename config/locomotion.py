@@ -15,6 +15,7 @@ args_to_watch = [
     ('discount', 'd'),
 ]
 
+
 logbase = 'logs'
 
 base = {

@@ -2,6 +2,7 @@ import pdb
 
 import diffuser.sampling as sampling
 import diffuser.utils as utils
+import mlflow
 
 
 #-----------------------------------------------------------------------------#
@@ -67,6 +68,7 @@ policy_config = utils.Config(
 
 logger = logger_config()
 policy = policy_config()
+mlflow.pytorch.autolog()
 
 
 #-----------------------------------------------------------------------------#

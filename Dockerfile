@@ -88,7 +88,7 @@ ENV PATH /opt/conda/envs/diffuser/bin:$PATH
 RUN curl -o /usr/local/bin/patchelf https://s3-us-west-2.amazonaws.com/openai-sci-artifacts/manual-builds/patchelf_0.9_amd64.elf \
     && chmod +x /usr/local/bin/patchelf
 
-RUN echo "source activate /opt/conda/envs/diffuser && export PYTHONPATH=$PYTHONPATH:/home/code && export CUDA_VISIBLE_DEVICES=0" >> ~/.bashrc
+RUN echo "source activate /opt/conda/envs/diffuser && export PYTHONPATH=$PYTHONPATH:/home/code && export CUDA_VISIBLE_DEVICES=0 && export MLFLOW_TRACKING_URI=sqlite:///mlruns.db" >> ~/.bashrc
 RUN source ~/.bashrc
 
 ##########################################################
