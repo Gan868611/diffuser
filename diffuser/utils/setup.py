@@ -5,6 +5,8 @@ import numpy as np
 import torch
 from tap import Tap
 import pdb
+import pytz
+from datetime import datetime
 
 from .serialization import mkdir
 from .git_utils import (
@@ -147,10 +149,20 @@ class Parser(Tap):
 
     def mkdir(self, args):
         if 'logbase' in dir(args) and 'dataset' in dir(args) and 'exp_name' in dir(args):
-            args.savepath = os.path.join(args.logbase, args.dataset, args.exp_name)
+            model, param = args.exp_name.split('/')
+            args.savepath = os.path.join(args.logbase, args.dataset, model)
+
+            timezone = pytz.timezone('Asia/Shanghai')
+            current_time = datetime.now(timezone)
+            time_suffix = current_time.strftime('%Y%m%d_%H%M%S')
+
+            args.savepath = os.path.join(args.savepath, time_suffix)
+            args.savepath += f'_{param}'
+
             self._dict['savepath'] = args.savepath
-            if 'suffix' in dir(args):
+            if 'suffix' in dir(args) and args.suffix != '':
                 args.savepath = os.path.join(args.savepath, args.suffix)
+            
             if mkdir(args.savepath):
                 print(f'[ utils/setup ] Made savepath: {args.savepath}')
             self.save()

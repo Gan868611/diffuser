@@ -3,6 +3,8 @@ import pdb
 import diffuser.sampling as sampling
 import diffuser.utils as utils
 import mlflow
+import pytz
+from datetime import datetime
 
 
 #-----------------------------------------------------------------------------#
@@ -14,6 +16,14 @@ class Parser(utils.Parser):
     config: str = 'config.locomotion'
 
 args = Parser().parse_args('plan')
+experiment_name = args.dataset
+experiment = mlflow.get_experiment_by_name(experiment_name)
+if experiment is None:
+    # Create a new experiment if it doesn't exist
+    mlflow.create_experiment(name=experiment_name)
+mlflow.set_experiment(experiment_name)
+mlflow.start_run(run_name=args.savepath.split("/", 2)[-1]) #remove logbase and dataset field
+mlflow.log_params(args.as_dict())
 
 
 #-----------------------------------------------------------------------------#
@@ -68,7 +78,6 @@ policy_config = utils.Config(
 
 logger = logger_config()
 policy = policy_config()
-mlflow.pytorch.autolog()
 
 
 #-----------------------------------------------------------------------------#
@@ -104,6 +113,15 @@ for t in range(args.max_episode_length):
         f'values: {samples.values} | scale: {args.scale}',
         flush=True,
     )
+    metrics = {
+        'reward': reward,
+        'total_reward': total_reward,
+        'score': score,
+        'scale': args.scale,
+    }
+    mlflow.log_metrics(metrics, step=t)
+
+    
 
     ## update rollout observations
     rollout.append(next_observation.copy())
@@ -118,3 +136,4 @@ for t in range(args.max_episode_length):
 
 ## write results to json file at `args.savepath`
 logger.finish(t, score, total_reward, terminal, diffusion_experiment, value_experiment)
+mlflow.end_run()
