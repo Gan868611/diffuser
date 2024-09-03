@@ -15,6 +15,26 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Train diffuser hopper",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/code/scripts/train.py",
+            "args": [
+                "--dataset","hopper-medium-v2"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Train diffuser walker2d",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/code/scripts/train.py",
+            "args": [
+                "--dataset","walker2d-medium-replay-v2"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Train value halfcheetah",
             "type": "debugpy",
             "request": "launch",

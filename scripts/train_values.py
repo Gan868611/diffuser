@@ -1,5 +1,6 @@
 import diffuser.utils as utils
 import pdb
+import mlflow
 
 
 #-----------------------------------------------------------------------------#
@@ -11,6 +12,15 @@ class Parser(utils.Parser):
     config: str = 'config.locomotion'
 
 args = Parser().parse_args('values')
+
+experiment_name = args.dataset
+experiment = mlflow.get_experiment_by_name(experiment_name)
+if experiment is None:
+    # Create a new experiment if it doesn't exist
+    mlflow.create_experiment(name=experiment_name)
+mlflow.set_experiment(experiment_name)
+mlflow.start_run(run_name=args.savepath.split("/", 2)[-1]) #remove logbase and dataset field
+mlflow.log_params(args.as_dict())
 
 
 #-----------------------------------------------------------------------------#

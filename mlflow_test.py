@@ -86,7 +86,7 @@ if experiment is None:
 # Set the experiment as active
 mlflow.set_experiment(experiment_name)
 
-timezone = pytz.timezone('Asia/Shanghai')
+timezone = pytz.timezone('Singapore')
 current_time = datetime.now(timezone)
 run_name = current_time.strftime('%Y-%m-%d %H:%M:%S %Z%z')
 

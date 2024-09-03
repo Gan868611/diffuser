@@ -8,6 +8,7 @@ import pdb
 from .arrays import batch_to_device, to_np, to_device, apply_dict
 from .timer import Timer
 from .cloud import sync_logs
+import mlflow
 
 def cycle(dl):
     while True:
@@ -124,6 +125,8 @@ class Trainer(object):
             if self.step % self.log_freq == 0:
                 infos_str = ' | '.join([f'{key}: {val:8.4f}' for key, val in infos.items()])
                 print(f'{self.step}: {loss:8.4f} | {infos_str} | t: {timer():8.4f}', flush=True)
+                mlflow.log_metric("loss", loss, step=self.step)
+                mlflow.log_metrics(infos, step=self.step)
 
             if self.step == 0 and self.sample_freq:
                 self.render_reference(self.n_reference)
