@@ -1,2 +1,2 @@
 from .temporal import TemporalUnet, ValueFunction
-from .diffusion import GaussianDiffusion, ValueDiffusion
+from .diffusion import GaussianDiffusion, ValueDiffusion, ClassifierFreeDiffusion

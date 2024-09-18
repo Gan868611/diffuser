@@ -132,7 +132,7 @@ class ValueDataset(SequenceDataset):
         ## [0, 1]
         normed = (value - self.vmin) / (self.vmax - self.vmin)
         ## [-1, 1]
-        normed = normed * 2 - 1
+        # normed = normed * 2 - 1
         return normed
 
     def __getitem__(self, idx):

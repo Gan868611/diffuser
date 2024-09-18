@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torch import nn
 import pdb
+from torchviz import make_dot
 
 import diffuser.utils as utils
 from .helpers import (
@@ -212,6 +213,12 @@ class GaussianDiffusion(nn.Module):
         x_noisy = apply_conditioning(x_noisy, cond, self.action_dim)
 
         x_recon = self.model(x_noisy, cond, t)
+        
+        dot = make_dot(x_recon, params=dict(self.model.named_parameters()))
+        # Render and save the visualization
+        dot.render("model_visual", format="png")
+
+
         x_recon = apply_conditioning(x_recon, cond, self.action_dim)
 
         assert noise.shape == x_recon.shape
@@ -247,4 +254,92 @@ class ValueDiffusion(GaussianDiffusion):
 
     def forward(self, x, cond, t):
         return self.model(x, cond, t)
+    
+class ClassifierFreeDiffusion(GaussianDiffusion):
+    def p_mean_variance(self, x, cond, values, t):
+        x_recon = self.predict_start_from_noise(x, t=t, noise=self.model(x, cond, values, t))
+
+        if self.clip_denoised:
+            x_recon.clamp_(-1., 1.)
+        else:
+            assert RuntimeError()
+
+        model_mean, posterior_variance, posterior_log_variance = self.q_posterior(
+                x_start=x_recon, x_t=x, t=t)
+        return model_mean, posterior_variance, posterior_log_variance
+    @torch.no_grad()
+    def default_sample_fn(model, x, cond, values, t):
+        model_mean, _, model_log_variance = model.p_mean_variance(x=x, cond=cond,values=values, t=t)
+        model_std = torch.exp(0.5 * model_log_variance)
+
+        # no noise when t == 0
+        noise = torch.randn_like(x)
+        noise[t == 0] = 0
+
+        values = torch.zeros(len(x), device=x.device)
+        return model_mean + model_std * noise, values
+    @torch.no_grad()
+    def p_sample_loop(self, shape, cond, values, verbose=True, return_chain=False, sample_fn=default_sample_fn, **sample_kwargs):
+        device = self.betas.device
+
+        batch_size = shape[0]
+        x = torch.randn(shape, device=device)
+        x = apply_conditioning(x, cond, self.action_dim)
+
+        chain = [x] if return_chain else None
+
+        progress = utils.Progress(self.n_timesteps) if verbose else utils.Silent()
+        for i in reversed(range(0, self.n_timesteps)):
+            t = make_timesteps(batch_size, i, device)
+            # value is a dummy for default sampling, return useful values_fn only when doing classifier guidance
+            x, value = sample_fn(self, x, cond, values, t, **sample_kwargs)
+            x = apply_conditioning(x, cond, self.action_dim)
+
+            progress.update({'t': i, 'vmin': value.min().item(), 'vmax': value.max().item()})
+            if return_chain: chain.append(x)
+
+        progress.stamp()
+
+        x, value = sort_by_values(x, value)
+        if return_chain: chain = torch.stack(chain, dim=1)
+        return Sample(x, value, chain)
+    
+
+    @torch.no_grad()
+    def conditional_sample(self, cond, values, horizon=None, **sample_kwargs):
+        '''
+            conditions : [ (time, state), ... ]
+        '''
+        device = self.betas.device
+        batch_size = len(cond[0])
+        horizon = horizon or self.horizon
+        shape = (batch_size, horizon, self.transition_dim)
+
+        return self.p_sample_loop(shape, cond, values, **sample_kwargs)
+    
+    def p_losses(self, x_start, cond, value, t):
+        # x_start = 
+
+        noise = torch.randn_like(x_start)
+
+        x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
+        x_noisy = apply_conditioning(x_noisy, cond, self.action_dim)
+
+        x_recon = self.model(x_noisy, cond, value, t)
+        x_recon = apply_conditioning(x_recon, cond, self.action_dim)
+
+        assert noise.shape == x_recon.shape
+
+        if self.predict_epsilon:
+            loss, info = self.loss_fn(x_recon, noise)
+        else:
+            loss, info = self.loss_fn(x_recon, x_start)
+
+        return loss, info
+    
+    def forward(self, cond, values, *args, **kwargs):
+        return self.conditional_sample(cond, values, *args, **kwargs)
+    
+
+
 

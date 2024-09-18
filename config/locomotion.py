@@ -147,6 +147,52 @@ base = {
         'verbose': True,
         'suffix': '',
     },
+    'classifier_free': {
+        ## model
+        'model': 'models.TemporalUnet',
+        'diffusion': 'models.ClassifierFreeDiffusion',
+        'horizon': 32,
+        'n_diffusion_steps': 20,
+        'action_weight': 10,
+        'loss_weights': None,
+        'loss_discount': 1,
+        'predict_epsilon': False,
+        'dim_mults': (1, 2, 4, 8),
+        'attention': False,
+        'renderer': 'utils.MuJoCoRenderer',
+
+        ## dataset
+        'loader': 'datasets.ValueDataset',
+        'normalizer': 'GaussianNormalizer',
+        'preprocess_fns': [],
+        'clip_denoised': False,
+        'use_padding': True,
+        'max_path_length': 1000,
+        'normed': True,
+
+        ## serialization
+        'logbase': logbase,
+        'prefix': 'classifier_free/defaults',
+        'exp_name': watch(args_to_watch),
+
+        ## training
+        'n_steps_per_epoch': 10000,
+        'loss_type': 'l2',
+        'n_train_steps': 1e6,
+        'batch_size': 32,
+        'learning_rate': 2e-4,
+        'gradient_accumulate_every': 2,
+        'ema_decay': 0.995,
+        'save_freq': 20000,
+        'sample_freq': 20000,
+        'n_saves': 5,
+        'save_parallel': False,
+        'n_reference': 8,
+        'bucket': None,
+        'device': 'cuda',
+        'seed': None,
+    },
+
 }
 
 
@@ -175,5 +221,10 @@ halfcheetah_medium_replay_v2 = halfcheetah_medium_v2 = halfcheetah_medium_expert
         'horizon': 4,
         'scale': 0.001,
         't_stopgrad': 4,
+    },
+    'classifier_free': {
+        'horizon': 4,
+        'dim_mults': (1, 4, 8),
+        'attention': True,
     },
 }

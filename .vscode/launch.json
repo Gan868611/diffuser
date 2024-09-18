@@ -15,6 +15,16 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Train classifierFree halfcheetah",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/code/scripts/train_classifier_free.py",
+            "args": [
+                "--dataset","halfcheetah-medium-expert-v2"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Train diffuser hopper",
             "type": "debugpy",
             "request": "launch",

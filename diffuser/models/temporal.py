@@ -31,17 +31,23 @@ class ResidualTemporalBlock(nn.Module):
             Rearrange('batch t -> batch t 1'),
         )
 
+        self.value_mlp = nn.Sequential(
+            nn.Mish(),
+            nn.Linear(embed_dim, out_channels),
+            Rearrange('batch t -> batch t 1'),
+        )
+
         self.residual_conv = nn.Conv1d(inp_channels, out_channels, 1) \
             if inp_channels != out_channels else nn.Identity()
 
-    def forward(self, x, t):
+    def forward(self, x, v, t):
         '''
             x : [ batch_size x inp_channels x horizon ]
             t : [ batch_size x embed_dim ]
             returns:
             out : [ batch_size x out_channels x horizon ]
         '''
-        out = self.blocks[0](x) + self.time_mlp(t)
+        out = self.blocks[0](x) + self.time_mlp(t) + self.value_mlp(v)
         out = self.blocks[1](out)
         return out + self.residual_conv(x)
 
@@ -67,6 +73,12 @@ class TemporalUnet(nn.Module):
         self.time_mlp = nn.Sequential(
             SinusoidalPosEmb(dim),
             nn.Linear(dim, dim * 4),
+            nn.Mish(),
+            nn.Linear(dim * 4, dim),
+        )
+
+        self.value_mlp = nn.Sequential(
+            nn.Linear(1, dim * 4),
             nn.Mish(),
             nn.Linear(dim * 4, dim),
         )
@@ -112,7 +124,7 @@ class TemporalUnet(nn.Module):
             nn.Conv1d(dim, transition_dim, 1),
         )
 
-    def forward(self, x, cond, time):
+    def forward(self, x, cond, value, time):
         '''
             x : [ batch x horizon x transition ]
         '''
@@ -120,23 +132,24 @@ class TemporalUnet(nn.Module):
         x = einops.rearrange(x, 'b h t -> b t h')
 
         t = self.time_mlp(time)
+        v = self.value_mlp(value)
         h = []
 
         for resnet, resnet2, attn, downsample in self.downs:
-            x = resnet(x, t)
-            x = resnet2(x, t)
+            x = resnet(x, v, t)
+            x = resnet2(x, v, t)
             x = attn(x)
             h.append(x)
             x = downsample(x)
 
-        x = self.mid_block1(x, t)
+        x = self.mid_block1(x, v, t)
         x = self.mid_attn(x)
-        x = self.mid_block2(x, t)
+        x = self.mid_block2(x, v, t)
 
         for resnet, resnet2, attn, upsample in self.ups:
             x = torch.cat((x, h.pop()), dim=1)
-            x = resnet(x, t)
-            x = resnet2(x, t)
+            x = resnet(x, v, t)
+            x = resnet2(x, v, t)
             x = attn(x)
             x = upsample(x)
 
