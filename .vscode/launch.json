@@ -68,6 +68,21 @@
                 "--value_loadpath", "f:values/defaults_H4_T20_d0.99"
             ],
             "console": "integratedTerminal",
+        },
+        {
+            "name": "Plan classifier free hopper",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/code/scripts/plan_classifier_free.py",
+            "args": [
+                "--dataset","hopper-medium-v2",
+                "--logbase",  "logs",
+                "--horizon", "32",
+                "--n_diffusion_steps",  "20",
+                "--discount", "0.99",
+                "--diffusion_loadpath", "f:classifier_free/20240918_180832_defaults_H32_T20"
+            ],
+            "console": "integratedTerminal",
         }
     ]
 }

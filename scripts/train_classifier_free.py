@@ -35,6 +35,9 @@ dataset_config = utils.Config(
     preprocess_fns=args.preprocess_fns,
     use_padding=args.use_padding,
     max_path_length=args.max_path_length,
+    discount=args.discount,
+    termination_penalty=args.termination_penalty,
+    normed=args.normed,
 )
 
 render_config = utils.Config(

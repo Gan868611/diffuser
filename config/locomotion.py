@@ -147,6 +147,7 @@ base = {
         'verbose': True,
         'suffix': '',
     },
+
     'classifier_free': {
         ## model
         'model': 'models.TemporalUnet',
@@ -168,7 +169,12 @@ base = {
         'clip_denoised': False,
         'use_padding': True,
         'max_path_length': 1000,
+
+         ## value-specific kwargs
+        'discount': 0.99,
+        'termination_penalty': -100,
         'normed': True,
+     
 
         ## serialization
         'logbase': logbase,
@@ -192,6 +198,41 @@ base = {
         'device': 'cuda',
         'seed': None,
     },
+
+    'plan_classifier_free': {
+        'policy': 'sampling.ClassifierFreePolicy',
+        'max_episode_length': 1000,
+        'batch_size': 64,
+        'preprocess_fns': [],
+        'device': 'cuda',
+        'seed': None,
+
+
+        ## serialization
+        'loadbase': None,
+        'logbase': logbase,
+        'prefix': 'plan_classifier_free/',
+        'exp_name': watch(args_to_watch),
+        'vis_freq': 100,
+        'max_render': 8,
+
+        ## diffusion model
+        'horizon': 32,
+        'n_diffusion_steps': 20,
+
+        ## value function
+        'discount': 0.99,
+
+        ## loading
+        'diffusion_loadpath': 'f:diffusion/defaults_H{horizon}_T{n_diffusion_steps}',
+
+        'diffusion_epoch': 'latest',
+        'value_epoch': 'latest',
+
+        'verbose': True,
+        'suffix': '',
+    },
+
 
 }
 
