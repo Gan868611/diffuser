@@ -65,7 +65,8 @@ class GuidedPolicy:
 
 class ClassifierFreePolicy:
 
-    def __init__(self, diffusion_model, normalizer, preprocess_fns, discount=0.99, **sample_kwargs):
+    def __init__(self, diffusion_model, normalizer, preprocess_fns,guidance_weight, discount=0.99, **sample_kwargs):
+        diffusion_model.guidance_weight = guidance_weight
         self.diffusion_model = diffusion_model
         self.normalizer = normalizer
         self.action_dim = diffusion_model.action_dim

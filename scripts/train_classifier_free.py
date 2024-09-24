@@ -82,6 +82,8 @@ diffusion_config = utils.Config(
     action_weight=args.action_weight,
     loss_weights=args.loss_weights,
     loss_discount=args.loss_discount,
+    p_uncond=args.p_uncond,
+    guidance_weight=args.guidance_weight,
     device=args.device,
 )
 

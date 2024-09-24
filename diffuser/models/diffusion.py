@@ -3,7 +3,7 @@ import numpy as np
 import torch
 from torch import nn
 import pdb
-from torchviz import make_dot
+# from torchviz import make_dot
 
 import diffuser.utils as utils
 from .helpers import (
@@ -214,9 +214,9 @@ class GaussianDiffusion(nn.Module):
 
         x_recon = self.model(x_noisy, cond, t)
         
-        dot = make_dot(x_recon, params=dict(self.model.named_parameters()))
+        # dot = make_dot(x_recon, params=dict(self.model.named_parameters()))
         # Render and save the visualization
-        dot.render("model_visual", format="png")
+        # dot.render("model_visual", format="png")
 
 
         x_recon = apply_conditioning(x_recon, cond, self.action_dim)
@@ -256,8 +256,23 @@ class ValueDiffusion(GaussianDiffusion):
         return self.model(x, cond, t)
     
 class ClassifierFreeDiffusion(GaussianDiffusion):
+    def __init__(self,  *args, p_uncond=0.5,guidance_weight, **kwargs):
+        super().__init__( *args, **kwargs)
+        self.p_uncond = p_uncond
+        self.guidance_weight = guidance_weight
+
     def p_mean_variance(self, x, cond, values, t):
-        x_recon = self.predict_start_from_noise(x, t=t, noise=self.model(x, cond, values, t))
+        #unconditional model
+        epsilon_uncond = self.model(x, cond, values, t)
+
+        #conditional model
+        values = torch.rand_like(values)
+        epsilon_cond = self.model(x, cond, values, t)
+
+        #weighted sum
+        epsilon = epsilon_uncond + self.guidance_weight * (epsilon_cond - epsilon_uncond)
+        
+        x_recon = self.predict_start_from_noise(x, t=t, noise=epsilon)
 
         if self.clip_denoised:
             x_recon.clamp_(-1., 1.)
@@ -324,6 +339,10 @@ class ClassifierFreeDiffusion(GaussianDiffusion):
 
         x_noisy = self.q_sample(x_start=x_start, t=t, noise=noise)
         x_noisy = apply_conditioning(x_noisy, cond, self.action_dim)
+
+        if torch.rand(1).item() < self.p_uncond:
+            # randomize values to make it unconditional (null)
+            value = torch.rand_like(value)
 
         x_recon = self.model(x_noisy, cond, value, t)
         x_recon = apply_conditioning(x_recon, cond, self.action_dim)

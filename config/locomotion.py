@@ -62,6 +62,7 @@ base = {
         'bucket': None,
         'device': 'cuda',
         'seed': None,
+        'suffix': '',
     },
 
     'values': {
@@ -105,6 +106,7 @@ base = {
         'bucket': None,
         'device': 'cuda',
         'seed': None,
+        'suffix': '',
     },
 
     'plan': {
@@ -161,6 +163,8 @@ base = {
         'dim_mults': (1, 2, 4, 8),
         'attention': False,
         'renderer': 'utils.MuJoCoRenderer',
+        'p_uncond': 0.5,
+        'guidance_weight': 2,
 
         ## dataset
         'loader': 'datasets.ValueDataset',
@@ -197,6 +201,7 @@ base = {
         'bucket': None,
         'device': 'cuda',
         'seed': None,
+        'suffix': '',
     },
 
     'plan_classifier_free': {
@@ -219,6 +224,7 @@ base = {
         ## diffusion model
         'horizon': 32,
         'n_diffusion_steps': 20,
+        'guidance_weight': 2.0,
 
         ## value function
         'discount': 0.99,

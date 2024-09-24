@@ -161,7 +161,7 @@ class Parser(Tap):
 
             self._dict['savepath'] = args.savepath
             if 'suffix' in dir(args) and args.suffix != '':
-                args.savepath = os.path.join(args.savepath, args.suffix)
+                args.savepath = args.savepath + '_' + args.suffix
             
             if mkdir(args.savepath):
                 print(f'[ utils/setup ] Made savepath: {args.savepath}')

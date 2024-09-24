@@ -67,6 +67,7 @@ policy_config = utils.Config(
     diffusion_model=diffusion,
     normalizer=dataset.normalizer,
     preprocess_fns=args.preprocess_fns,
+    guidance_weight=args.guidance_weight,
     verbose=False,
 )
 
