@@ -61,12 +61,13 @@
             "request": "launch",
             "program": "/home/code/scripts/plan_guided.py",
             "args": [
-                "--dataset","halfcheetah-medium-expert-v2",
+                "--dataset","hopper-medium-v2",
                 "--logbase",  "logs",
-                "--horizon", "4",
+                "--horizon", "32",
                 "--n_diffusion_steps",  "20",
                 "--discount", "0.99",
-                "--value_loadpath", "f:values/defaults_H4_T20_d0.99"
+                "--diffusion_loadpath", "/home/code/logs/hopper-medium-v2/diffusion/20240903_162200_defaults_H32_T20",
+                "--value_loadpath", "/home/code/logs/hopper-medium-v2/values/20240903_163700_defaults_H32_T20_d0.99"
             ],
             "console": "integratedTerminal",
         },

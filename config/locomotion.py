@@ -152,7 +152,7 @@ base = {
 
     'classifier_free': {
         ## model
-        'model': 'models.TemporalUnet',
+        'model': 'models.TemporalUnetClassifierFree',
         'diffusion': 'models.ClassifierFreeDiffusion',
         'horizon': 32,
         'n_diffusion_steps': 20,
