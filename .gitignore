@@ -3,7 +3,7 @@ logs/
 wandb/
 mlruns/
 nohup_out/
-mlruns.db
+# mlruns.db
 *.sif
 
 fuse.cfg
