@@ -263,11 +263,11 @@ class ClassifierFreeDiffusion(GaussianDiffusion):
 
     def p_mean_variance(self, x, cond, values, t):
         #unconditional model
-        epsilon_uncond = self.model(x, cond, values, t)
+        epsilon_cond = self.model(x, cond, values, t)
 
         #conditional model
         values = torch.rand_like(values)
-        epsilon_cond = self.model(x, cond, values, t)
+        epsilon_uncond = self.model(x, cond, values, t)
 
         #weighted sum
         epsilon = epsilon_uncond + self.guidance_weight * (epsilon_cond - epsilon_uncond)
@@ -306,7 +306,7 @@ class ClassifierFreeDiffusion(GaussianDiffusion):
         progress = utils.Progress(self.n_timesteps) if verbose else utils.Silent()
         for i in reversed(range(0, self.n_timesteps)):
             t = make_timesteps(batch_size, i, device)
-            # value is a dummy for default sampling, return useful values_fn only when doing classifier guidance
+            # returned value is a dummy for default sampling, return useful values_fn only when doing classifier guidance
             x, value = sample_fn(self, x, cond, values, t, **sample_kwargs)
             x = apply_conditioning(x, cond, self.action_dim)
 

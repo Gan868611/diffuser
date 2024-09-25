@@ -2,7 +2,8 @@ bin/
 logs/
 wandb/
 mlruns/
-
+nohup_out/
+mlruns.db
 *.sif
 
 fuse.cfg
@@ -143,3 +144,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+

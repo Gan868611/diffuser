@@ -81,7 +81,7 @@
                 "--horizon", "32",
                 "--n_diffusion_steps",  "20",
                 "--discount", "0.99",
-                "--guidance_weight", "0.1",
+                "--guidance_weight", "1.2",
                 "--diffusion_loadpath", "f:classifier_free/20240924_150537_defaults_H32_T20_d0.99_p_uncond_0.5"
             ],
             "console": "integratedTerminal",

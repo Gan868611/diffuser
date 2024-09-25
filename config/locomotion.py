@@ -211,6 +211,7 @@ base = {
         'preprocess_fns': [],
         'device': 'cuda',
         'seed': None,
+        'p_uncond': 0.5,
 
 
         ## serialization

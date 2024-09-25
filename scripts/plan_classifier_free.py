@@ -124,6 +124,7 @@ for t in range(args.max_episode_length):
     logger.log(t, samples, state, rollout)
 
     if terminal:
+        print("Terminated???")
         break
 
     observation = next_observation
